@@ -1259,6 +1259,7 @@ export default function App() {
                                         <label className="block text-sm font-bold text-slate-700 mb-2">{t.mobileNumber} <span className="text-rose-500">*</span></label>
                                         <input
                                             type="tel"
+                                            dir={lang === 'ar' ? 'rtl' : 'ltr'}
                                             value={mobile}
                                             onChange={(e) => setMobile(e.target.value)}
                                             required
