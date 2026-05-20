@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply text-[#6b6375] bg-white font-sans antialiased;
+    }
+
+    h1, h2 {
+        @apply font-medium text-[#08060d];
+    }
+
+    h1 {
+        @apply text-6xl my-8; /* Approx 56px */
+    }
+}
