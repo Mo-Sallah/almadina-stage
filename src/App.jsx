@@ -1010,15 +1010,15 @@ export default function App() {
             {/* Playful Navigation Top Header */}
             <nav className="bg-white/95 border-b-4 border-yellow-300 sticky top-0 z-30 shadow-md backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-20 items-center">
+                    <div className="flex flex-col lg:flex-row lg:justify-between py-3 lg:h-20 lg:items-center gap-3">
 
                         {/* Branding Title */}
-                        <div className="flex items-center space-x-2.5 gap-2.5">
-                            <div className="w-12 h-12 bg-gradient-to-tr from-amber-400 via-orange-400 to-pink-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-200 transform hover:rotate-6 transition-all duration-200 cursor-pointer">
+                        <div className="flex items-center gap-2 w-full lg:w-auto justify-center lg:justify-start">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-tr from-amber-400 via-orange-400 to-pink-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-200 transform hover:rotate-6 transition-all duration-200 cursor-pointer">
                                 <Star className="w-7 h-7" />
                             </div>
                             <div>
-                                <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent">
+                                <span className="text-lg sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent">
                                     {t.title}
                                 </span>
                                 <span className="text-xs block text-purple-500 font-bold tracking-wider -mt-0.5">
@@ -1028,12 +1028,12 @@ export default function App() {
                         </div>
 
                         {/* Menu and Controls */}
-                        <div className="flex items-center space-x-2 gap-2">
+                        <div className="flex flex-wrap justify-center lg:justify-end items-center gap-2 w-full lg:w-auto">
 
                             {/* Submission Portal / Voting Tab switchers */}
                             <button
                                 onClick={() => setCurrentView('submission')}
-                                className={`px-4 py-2.5 text-xs sm:text-sm font-black rounded-2xl transition-all border-b-4 font-normal ${currentView === 'submission'
+                                className={`px-3 sm:px-4 py-2 text-[11px] sm:text-sm font-black rounded-2xl transition-all border-b-4 font-normal ${currentView === 'submission'
                                         ? 'bg-purple-600 border-purple-800 text-white shadow-md'
                                         : 'bg-purple-50 hover:bg-purple-100 text-purple-700 border-transparent hover:border-purple-200'
                                     }`}
@@ -1043,7 +1043,7 @@ export default function App() {
 
                             <button
                                 onClick={() => setCurrentView('voting')}
-                                className={`px-4 py-2.5 text-xs sm:text-sm font-black rounded-2xl transition-all border-b-4 font-normal ${currentView === 'voting'
+                                className={`px-3 sm:px-4 py-2 text-[11px] sm:text-sm font-black rounded-2xl transition-all border-b-4 font-normal ${currentView === 'voting'
                                         ? 'bg-purple-600 border-purple-800 text-white shadow-md '
                                         : 'bg-purple-50 hover:bg-purple-100 text-purple-700 border-transparent hover:border-purple-200'
                                     }`}
@@ -1063,7 +1063,7 @@ export default function App() {
                             {currentView !== 'admin' ? (
                                 <button
                                     onClick={() => setShowAuthModal(true)}
-                                    className="flex items-center space-x-1 gap-1 px-4 h-11 text-xs sm:text-sm font-black text-slate-700 bg-slate-100 hover:bg-yellow-100 border-b-4 border-slate-300 hover:border-yellow-400 rounded-2xl transition-all duration-200"
+                                    className="flex items-center space-x-1 gap-1 px-3 sm:px-4 h-10 sm:h-11 text-[11px] sm:text-sm font-black text-slate-700 bg-slate-100 hover:bg-yellow-100 border-b-4 border-slate-300 hover:border-yellow-400 rounded-2xl transition-all duration-200"
                                 >
                                     <Lock className="w-4 h-4 text-purple-600" />
                                     <span className="hidden md:inline font-normal">{t.organizerPanel}</span>
@@ -1071,7 +1071,7 @@ export default function App() {
                             ) : (
                                 <button
                                     onClick={() => setCurrentView('submission')}
-                                    className="flex items-center space-x-1 gap-1 px-4 h-11 text-xs sm:text-sm font-black text-slate-755 bg-slate-100 hover:bg-rose-50 border-b-4 border-slate-300 hover:border-rose-400 rounded-2xl transition-all duration-200"
+                                        className="flex items-center space-x-1 gap-1 px-3 sm:px-4 h-10 sm:h-11 text-[11px] sm:text-sm font-black text-slate-755 bg-slate-100 hover:bg-rose-50 border-b-4 border-slate-300 hover:border-rose-400 rounded-2xl transition-all duration-200"
                                 >
                                     <ArrowLeft className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} />
                                     <span>{t.exitDashboard}</span>
