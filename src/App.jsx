@@ -1052,13 +1052,13 @@ export default function App() {
                             </button>
 
                             {/* Bilingual Toggle Button */}
-                            <button
-                                onClick={handleLanguageToggle}
-                                className="flex items-center justify-center w-11 h-11 text-amber-700 bg-amber-100 hover:bg-amber-200 border-b-4 border-amber-300 hover:border-amber-400 rounded-2xl transition-all duration-200"
-                                title={lang === 'en' ? 'العربية' : 'English'}
-                            >
-                                <Languages className="w-5 h-5" />
-                            </button>
+                            {/*<button*/}
+                            {/*    onClick={handleLanguageToggle}*/}
+                            {/*    className="flex items-center justify-center w-11 h-11 text-amber-700 bg-amber-100 hover:bg-amber-200 border-b-4 border-amber-300 hover:border-amber-400 rounded-2xl transition-all duration-200"*/}
+                            {/*    title={lang === 'en' ? 'العربية' : 'English'}*/}
+                            {/*>*/}
+                            {/*    <Languages className="w-5 h-5" />*/}
+                            {/*</button>*/}
 
                             {currentView !== 'admin' ? (
                                 <button
