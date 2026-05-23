@@ -508,72 +508,9 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(false);
 
   // User (parent) session state
-  const [loggedInUser, setLoggedInUser] = useState(null);
-  const [accessToken, setAccessToken] = useState(null);
-  const isRefreshing = useRef(false);
-
-  // On mount: try to restore session from refresh token cookie
-  useEffect(() => {
-    const restoreSession = async () => {
-      try {
-        const res = await fetch(`${apiUrl}/api/user/refresh`, { method: 'POST', credentials: 'include' });
-        const data = await res.json();
-        if (data.status === 'success') {
-          setAccessToken(data.accessToken);
-          setLoggedInUser(data.user);
-        }
-      } catch { /* no session to restore */ }
-    };
-    restoreSession();
-  }, []);
-
-  // apiFetch: like fetch() but auto-attaches access token and silently refreshes on 401
-  const apiFetch = async (url, options = {}) => {
-    const doRequest = (token) => fetch(url, {
-      ...options,
-      credentials: 'include',
-      headers: { ...(options.headers || {}), Authorization: `Bearer ${token}` },
-    });
-
-    let res = await doRequest(accessToken);
-
-    if (res.status === 401 && !isRefreshing.current) {
-      isRefreshing.current = true;
-      try {
-        const refreshRes = await fetch(`${apiUrl}/api/user/refresh`, { method: 'POST', credentials: 'include' });
-        const refreshData = await refreshRes.json();
-        if (refreshData.status === 'success') {
-          setAccessToken(refreshData.accessToken);
-          setLoggedInUser(refreshData.user);
-          isRefreshing.current = false;
-          res = await doRequest(refreshData.accessToken); // retry original request
-        } else {
-          // Refresh token expired → logout
-          isRefreshing.current = false;
-          handleSessionExpired();
-          throw new Error('session_expired');
-        }
-      } catch (err) {
-        isRefreshing.current = false;
-        if (err.message !== 'session_expired') handleSessionExpired();
-        throw err;
-      }
-    }
-    return res;
-  };
-
-  const handleSessionExpired = () => {
-    setLoggedInUser(null);
-    setAccessToken(null);
-    setUserSubmissions([]);
-    setCurrentView('submission');
-    showToast(
-      lang === 'ar'
-        ? 'انتهت جلستك. يرجى تسجيل الدخول مجدداً.'
-        : 'Your session expired. Please log in again.',
-      'error'
-    );
-  };
+  const [loggedInUser, setLoggedInUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('almadinah_user') || 'null'); } catch { return null; }
+  });
   
   const [userSubmissions, setUserSubmissions] = useState([]);
   const [submissions, setSubmissions] = useState([]);
@@ -1021,59 +958,27 @@ export default function App() {
   };
 
   // Simulated Voting logic
-  const registerVote = async (item) => {
-    if (!loggedInUser) {
-      showToast(lang === 'ar' ? 'يجب تسجيل الدخول للتصويت' : 'Please log in to vote', "error");
-      return;
-    }
-
-    const voterRecord = JSON.parse(localStorage.getItem("almadinah_user_votes_" + loggedInUser.id) || "[]");
+  const registerVote = (item) => {
+    const voterRecord = JSON.parse(localStorage.getItem("almadinah_user_votes") || "[]");
     if (voterRecord.includes(item.submissionCode)) {
       showToast(t.alreadyVoted, "error");
       return;
     }
 
-    // Optimistically update UI
-    setSubmissions(prev => prev.map(sub =>
-      sub.submissionCode === item.submissionCode
-        ? { ...sub, votes: (sub.votes || 0) + 1 }
-        : sub
-    ));
-
-    try {
-      const response = await apiFetch(`${apiUrl}/api/submissions/vote/${item.submissionCode}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const result = await response.json();
-
-      if (result.status === 'success') {
-        // Save to localStorage as cache
-        voterRecord.push(item.submissionCode);
-        localStorage.setItem("almadinah_user_votes_" + loggedInUser.id, JSON.stringify(voterRecord));
-        showToast(t.votedSuccessfully, "success");
-      } else if (result.message === 'already_voted') {
-        // Server says already voted — rollback and update local cache
-        setSubmissions(prev => prev.map(sub =>
-          sub.submissionCode === item.submissionCode
-            ? { ...sub, votes: Math.max((sub.votes || 1) - 1, 0) }
-            : sub
-        ));
-        voterRecord.push(item.submissionCode);
-        localStorage.setItem("almadinah_user_votes_" + loggedInUser.id, JSON.stringify(voterRecord));
-        showToast(lang === 'ar' ? 'لقد صوّتت لهذا المتسابق من قبل' : 'You already voted for this contestant', "error");
-      } else {
-        throw new Error(result.message);
+    const updatedSubmissions = submissions.map(sub => {
+      if (sub.submissionCode === item.submissionCode) {
+        return { ...sub, votes: (sub.votes || 0) + 1 };
       }
-    } catch (err) {
-      // Rollback optimistic update
-      setSubmissions(prev => prev.map(sub =>
-        sub.submissionCode === item.submissionCode
-          ? { ...sub, votes: Math.max((sub.votes || 1) - 1, 0) }
-          : sub
-      ));
-      showToast(lang === 'ar' ? 'فشل حفظ التصويت. حاول مرة أخرى.' : 'Failed to save vote. Please try again.', "error");
-    }
+      return sub;
+    });
+
+    setSubmissions(updatedSubmissions);
+    localStorage.setItem("submissions_almadinah_stage", JSON.stringify(updatedSubmissions));
+
+    voterRecord.push(item.submissionCode);
+    localStorage.setItem("almadinah_user_votes", JSON.stringify(voterRecord));
+
+    showToast(t.votedSuccessfully, "success");
   };
 
   // Parent status inquiry
@@ -1107,7 +1012,7 @@ export default function App() {
           setCurrentView('admin');
           showToast(lang === 'ar' ? 'تم الدخول بنجاح إلى لوحة تحكيم المدينة ستيج' : 'Admin successfully logged in', 'success');
         } else {
-          setAuthError(translateServerError(result.message) || t.incorrectPasscode);
+          setAuthError(result.message || t.incorrectPasscode);
         }
       } catch (err) {
         setAuthError(lang === 'ar' ? 'عذراً، لم نتمكن من الوصول لخادم الإدارة.' : 'Admin server is offline or unreachable.');
@@ -1141,13 +1046,14 @@ export default function App() {
           });
           const result = await response.json();
           if (result.status === 'success') {
-            setAccessToken(result.accessToken);
-            setLoggedInUser(result.user);
+            const user = result.user;
+            setLoggedInUser(user);
+            localStorage.setItem('almadinah_user', JSON.stringify(user));
             setShowAuthModal(false);
             clearAuthInputs();
             showToast(lang === 'ar' ? 'تم إنشاء حساب ولي الأمر بنجاح! أهلاً بك' : 'Account created successfully!', 'success');
           } else {
-            setAuthError(translateServerError(result.message));
+            setAuthError(result.message);
           }
         } catch (err) {
           setAuthError(lang === 'ar' ? 'تعذّر الاتصال بالخادم. يرجى التحقق من الاتصال والمحاولة مرة أخرى.' : 'Could not reach the server. Please check your connection and try again.');
@@ -1162,13 +1068,14 @@ export default function App() {
           });
           const result = await response.json();
           if (result.status === 'success') {
-            setAccessToken(result.accessToken);
-            setLoggedInUser(result.user);
+            const user = result.user;
+            setLoggedInUser(user);
+            localStorage.setItem('almadinah_user', JSON.stringify(user));
             setShowAuthModal(false);
             clearAuthInputs();
-            showToast(lang === 'ar' ? `أهلاً بك مجدداً يا ${result.user.username}!` : `Welcome back, ${result.user.username}!`, 'success');
+            showToast(lang === 'ar' ? `أهلاً بك مجدداً يا ${user.username}!` : `Welcome back, ${user.username}!`, 'success');
           } else {
-            setAuthError(translateServerError(result.message));
+            setAuthError(result.message);
           }
         } catch (err) {
           setAuthError(lang === 'ar' ? 'تعذّر الاتصال بالخادم. يرجى التحقق من الاتصال والمحاولة مرة أخرى.' : 'Could not reach the server. Please check your connection and try again.');
@@ -1178,20 +1085,6 @@ export default function App() {
     setAuthLoading(false);
   };
 
-  // Translate server error messages to the current language
-  const translateServerError = (msg) => {
-    if (lang !== 'ar') return msg;
-    const map = {
-      'Invalid username or password':           'اسم المستخدم أو كلمة المرور غير صحيحة',
-      'Username already taken. Please choose another.': 'اسم المستخدم مستخدم بالفعل. يرجى اختيار اسم آخر.',
-      'Username and password are required':     'اسم المستخدم وكلمة المرور مطلوبان',
-      'Username must be at least 3 characters': 'يجب أن يكون اسم المستخدم 3 أحرف على الأقل',
-      'Password must be at least 6 characters': 'يجب ألا تقل كلمة المرور عن 6 أحرف',
-      'Internal server error':                  'خطأ داخلي في الخادم',
-    };
-    return map[msg] || msg;
-  };
-
   const clearAuthInputs = () => {
     setUsernameInput('');
     setPasswordInput('');
@@ -1199,10 +1092,8 @@ export default function App() {
     setAuthError('');
   };
 
-  const handleUserLogout = async () => {
-    try { await fetch(`${apiUrl}/api/user/logout`, { method: 'POST', credentials: 'include' }); } catch {}
+  const handleUserLogout = () => {
     setLoggedInUser(null);
-    setAccessToken(null);
     localStorage.removeItem('almadinah_user');
     setUserSubmissions([]);
     setCurrentView('submission');
@@ -1210,23 +1101,19 @@ export default function App() {
   };
 
   const loadUserSubmissions = async (userId) => {
+    if (userId === 'simulated-parent-id') {
+      const sandboxData = JSON.parse(localStorage.getItem("submissions_almadinah_stage") || "[]");
+      setUserSubmissions(sandboxData);
+      return;
+    }
     try {
-      const [subsResponse, votesResponse] = await Promise.all([
-        apiFetch(`${apiUrl}/api/user/${userId}/submissions`),
-        apiFetch(`${apiUrl}/api/user/${userId}/votes`),
-      ]);
-      if (subsResponse.ok) {
-        const data = await subsResponse.json();
-        setUserSubmissions(Array.isArray(data) ? data : []);
-      }
-      if (votesResponse.ok) {
-        const votesData = await votesResponse.json();
-        if (votesData.votedCodes) {
-          localStorage.setItem("almadinah_user_votes_" + userId, JSON.stringify(votesData.votedCodes));
-        }
-      }
+      const response = await fetch(`${apiUrl}/api/user/${userId}/submissions`);
+      if (!response.ok) throw new Error();
+      const data = await response.json();
+      setUserSubmissions(Array.isArray(data) ? data : []);
     } catch {
-      setUserSubmissions([]);
+      const sandboxData = JSON.parse(localStorage.getItem("submissions_almadinah_stage") || "[]");
+      setUserSubmissions(sandboxData);
     }
   };
 
@@ -1421,7 +1308,7 @@ export default function App() {
 
         {/* VIEW 1: Public Submission Desk & Form */}
         {currentView === 'submission' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
             {/* Guide Guidelines Sidebar */}
             <div className="lg:col-span-4 space-y-6">
@@ -1905,7 +1792,6 @@ export default function App() {
         )}
 
         {/* VIEW 3: Success Confirmation Page */}
-
         {currentView === 'success' && receiptDetails && (
           <section className="max-w-lg mx-auto py-10 text-center transition-all duration-300">
             <div className="bg-white rounded-[2.5rem] border-4 border-yellow-300 shadow-2xl p-8 sm:p-10 space-y-6">
@@ -1962,7 +1848,7 @@ export default function App() {
 
         {/* VIEW 5: Parent / User Dashboard */}
         {loggedInUser && currentView === 'submission' && (
-          <div style={{ marginTop: '2.5rem' }} className="bg-white rounded-[2rem] border-4 border-emerald-200 shadow-lg p-6 sm:p-8">
+          <div className="mb-8 bg-white rounded-[2rem] border-4 border-emerald-200 shadow-lg p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm">
