@@ -469,9 +469,7 @@ export default function App() {
   const [lang, setLang] = useState(localStorage.getItem('contest_app_lang') || 'ar');
 
   // Backend API URL - update this after Railway deployment
-  const API_URL = localStorage.getItem('almadinah_api_url') || 'http://localhost:3001';
-  const [apiUrl, setApiUrl] = useState(API_URL);
-  const [tempApiUrl, setTempApiUrl] = useState(API_URL);
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
   const isConnected = !!apiUrl;
 
   // Form input states
@@ -1231,14 +1229,8 @@ export default function App() {
   };
 
   const saveGoogleIntegration = () => {
-    if (tempApiUrl.trim()) {
-      localStorage.setItem('almadinah_api_url', tempApiUrl.trim());
-      setApiUrl(tempApiUrl.trim());
-      setShowSetupModal(false);
-      showToast(t.toastSettingsSynced, "success");
-    } else {
-      showToast("Please enter a valid API URL", "error");
-    }
+    setShowSetupModal(false);
+    showToast(t.toastSettingsSynced, "success");
   };
 
   const exportToCSV = () => {
