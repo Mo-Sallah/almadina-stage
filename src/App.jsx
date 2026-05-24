@@ -2138,6 +2138,8 @@ export default function App() {
                       <th className={`px-5 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{lang === 'ar' ? 'العمر' : 'Age'}</th>
                       <th className={`px-5 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.mobileNumber}</th>
                       <th className={`px-5 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.nationalId}</th>
+                      <th className={`px-5 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{lang === 'ar' ? 'المستخدم' : 'Submitted By'}</th>
+                      <th className={`px-5 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{lang === 'ar' ? 'تاريخ التسجيل' : 'Date'}</th>
                       <th className={`px-5 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.statusLabel}</th>
                       <th className={`px-5 py-3 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{lang === 'ar' ? 'التقييم' : 'Score'}</th>
                       <th className={`px-5 py-3 ${lang === 'ar' ? 'text-left' : 'text-right'}`}>{t.action}</th>
@@ -2149,7 +2151,7 @@ export default function App() {
                       adminTab === 'evaluated' ? item.status !== 'Under Review' : true
                     ).length === 0 ? (
                       <tr>
-                        <td colSpan="7" className="text-center py-16 text-slate-400">
+                        <td colSpan="9" className="text-center py-16 text-slate-400">
                           <div className="flex flex-col items-center justify-center gap-2">
                             <FolderOpen className="w-10 h-10 text-slate-300" />
                             <p className="font-medium text-xs">{lang === 'ar' ? 'لا توجد بيانات مطابقة' : 'No matching records'}</p>
@@ -2176,6 +2178,24 @@ export default function App() {
                             <td className="px-5 py-3 text-xs font-bold text-slate-700 whitespace-nowrap">{item.childAge} {lang === 'ar' ? 'سنة' : 'yrs'}</td>
                             <td className="px-5 py-3 font-mono text-xs text-slate-600 whitespace-nowrap" dir="ltr">{item.mobile || 'N/A'}</td>
                             <td className="px-5 py-3 font-mono text-xs text-slate-600">{item.nationalId || 'N/A'}</td>
+                            <td className="px-5 py-3">
+                              {item.submittedBy ? (
+                                <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[11px] font-bold">
+                                  <Users className="w-3 h-3" />
+                                  {item.submittedBy}
+                                </span>
+                              ) : (
+                                <span className="text-slate-300 text-xs">—</span>
+                              )}
+                            </td>
+                            <td className="px-5 py-3 text-xs text-slate-500 whitespace-nowrap" dir="ltr">
+                              {item.createdAt ? (
+                                <div>
+                                  <p className="font-semibold text-slate-700">{new Date(item.createdAt).toLocaleDateString('ar-SA')}</p>
+                                  <p className="text-[10px] text-slate-400">{new Date(item.createdAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</p>
+                                </div>
+                              ) : '—'}
+                            </td>
                             <td className="px-5 py-3">
                               <span className={`px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap ${
                                 item.status === 'Winner' ? 'bg-yellow-100 text-yellow-800' :
