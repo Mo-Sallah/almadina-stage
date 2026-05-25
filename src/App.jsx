@@ -89,7 +89,7 @@ const TRANSLATIONS = {
     uploadingEntry: "جاري إرسال الإبداع المميّز...",
     subConfirmed: "أهلاً بك في عالم الإبداع والخطابة!",
     subConfirmedSub: "تم تسجيل طفلك بنجاح في مسابقة المدينة ستيج وحفظ الفيديو ووثيقة الهوية. لجنة التحكيم الموقرة متحمسة جداً لمشاهدة المقطع الرائع وسنقوم بإعلان النتائج قريباً!",
-    applicant: "بطلنا المبدع:",
+    applicant: "ولي الأمر:",
     idPassport: "الهوية الوطنية للبطل:",
     submissionCode: "رمز المشاركة الذهبي:",
     statusLabel: "حالة المشاركة الحالية:",
@@ -120,7 +120,7 @@ const TRANSLATIONS = {
     passcodeInstructions: "الرجاء كتابة رمز المرور الإداري السري للدخول إلى نظام التحكيم وتقييم المتسابقين وإصدار الشهادات.",
     passcode: "رمز المرور السري للجنة",
     passcodePlaceholder: "أدخل رمز المرور السري",
-    defaultPasscode: "رمز المرور الافتراضي للتجربة والمحاكاة هو: admin123",
+    defaultPasscode: "",
     accessDashboard: "دخول لبوابة التحكيم",
     incorrectPasscode: "رمز المرور غير صحيح! يرجى المحاولة مرة أخرى بتركيز.",
     connectorTitle: "رابط تهيئة وتوصيل Google Workspace",
@@ -273,7 +273,7 @@ const TRANSLATIONS = {
     passcodeInstructions: "Please provide the secret administrative passcode to access the grading and evaluation portal.",
     passcode: "Jury Passcode",
     passcodePlaceholder: "Enter secret key",
-    defaultPasscode: "The default developer passcode is: admin123",
+    defaultPasscode: "",
     accessDashboard: "Access Organizer Deck",
     incorrectPasscode: "Incorrect passcode, please try again with focus.",
     connectorTitle: "Google Workspace API Setup Helper",
@@ -792,6 +792,27 @@ export default function App() {
 
     if (!fullName || !mobile || !nationalId || !childAge || !parentAgreed) {
       showToast(t.toastFormError, "error");
+      return;
+    }
+
+    // Full name: must have at least 4 parts
+    const nameParts = fullName.trim().split(/\s+/);
+    if (nameParts.length < 4) {
+      showToast(lang === 'ar' ? 'يرجى إدخال الاسم الرباعي كاملاً (الاسم الأول والثاني والثالث واللقب)' : 'Please enter the full four-part name (first, second, third, and last name)', "error");
+      return;
+    }
+
+    // Saudi mobile: must start with 05 and be exactly 10 digits
+    const saudiMobileRegex = /^05[0-9]{8}$/;
+    if (!saudiMobileRegex.test(mobile.trim())) {
+      showToast(lang === 'ar' ? 'رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام (مثال: 0512345678)' : 'Mobile number must start with 05 and be exactly 10 digits (e.g. 0512345678)', "error");
+      return;
+    }
+
+    // National ID: letters and numbers only, no spaces or special characters
+    const nationalIdRegex = /^[a-zA-Z0-9\u0600-\u06FF]+$/;
+    if (!nationalIdRegex.test(nationalId.trim())) {
+      showToast(lang === 'ar' ? 'رقم الهوية يجب أن يحتوي على أحرف وأرقام فقط بدون رموز أو مسافات' : 'National ID must contain only letters and numbers, no spaces or special characters', "error");
       return;
     }
     if (!selectedFile) {
@@ -1608,8 +1629,7 @@ export default function App() {
                           value={childAge}
                           onChange={(e) => setChildAge(e.target.value)}
                           required
-                          className={`w-full bg-slate-50 border-2 border-slate-200 rounded-2xl text-slate-900 font-semibold focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-400 transition-all text-sm appearance-none py-4 ${lang === 'ar' ? 'pl-10 pr-5' : 'pr-10 pl-5'
-                            }`}
+                          className={`w-full bg-slate-50 border-2 border-slate-200 rounded-2xl font-semibold focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-400 transition-all text-sm appearance-none py-4 ${lang === 'ar' ? 'pl-10 pr-5' : 'pr-10 pl-5'} ${childAge ? 'text-slate-900' : 'text-slate-400'}`}
                         >
                           <option value="" className="text-slate-400">{t.selectAge}</option>
                           {[7, 8, 9, 10, 11, 12, 13, 14].map(age => (
