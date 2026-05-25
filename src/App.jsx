@@ -2363,7 +2363,7 @@ export default function App() {
 
                 {authTab === 'admin' && (
                   <p className={`text-[10px] text-slate-400 mt-1 ${lang === 'ar' ? 'text-right' : ''}`}>
-                    💡 {t.defaultPasscode}
+                    {t.defaultPasscode}
                   </p>
                 )}
 
