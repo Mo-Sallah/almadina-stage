@@ -1337,18 +1337,25 @@ export default function App() {
           <div className="flex flex-col lg:flex-row lg:justify-between py-3 lg:h-20 lg:items-center gap-3">
 
             {/* Branding Title */}
-            <div className="flex items-center gap-2 w-full lg:w-auto justify-center lg:justify-start">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-tr from-amber-400 via-orange-400 to-pink-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-200 transform hover:rotate-6 transition-all duration-200 cursor-pointer">
-                <Star className="w-7 h-7" />
-              </div>
-              <div>
-                <span className="text-lg sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent">
-                  {t.title}
-                </span>
-                <span className="text-xs block text-purple-500 font-bold tracking-wider -mt-0.5">
-                  {t.subtitle}
-                </span>
-              </div>
+            <div className="flex items-center gap-3 w-full lg:w-auto justify-center lg:justify-start">
+              {/* Logo 1: جمعية البر */}
+              <img
+                src="/الشعارات_33-0٥.png"
+                alt="جمعية البر"
+                className="h-10 sm:h-12 w-auto object-contain"
+              />
+              {/* Logo 2: أطفال طيبة / Taibah Kids */}
+              <img
+                src="/logo-removebg-preview.png"
+                alt="Taibah Kids"
+                className="h-10 sm:h-12 w-auto object-contain"
+              />
+              {/* Logo 3: المدينة ستيج / Almadinah Stage */}
+              <img
+                src="/الشعارات_33-0٨.png"
+                alt="Almadinah Stage"
+                className="h-10 sm:h-12 w-auto object-contain"
+              />
             </div>
 
             {/* Menu and Controls */}
