@@ -175,7 +175,7 @@ const TRANSLATIONS = {
     // Additional features
     publicVoteTab: "ساحة تصويت الجمهور العام والتشجيع",
     publicVoteBtn: "دخول ساحة التصويت",
-    submissionTab: "بوابة تسجيل الأبطال",
+    submissionTab: "تسجيل الأطفال",
     idProofLabel: "وثيقة هوية البطل المرفوعة:",
     viewIdProof: "عرض وثيقة الهوية",
     certButton: "تنزيل وطباعة شهادة المشاركة الملوّنة والتقدير",
@@ -1491,7 +1491,7 @@ export default function App() {
                   className="flex items-center gap-1.5 px-3 sm:px-5 h-10 sm:h-11 text-[11px] sm:text-sm font-bold text-[#6A5E9E] bg-[#F4F3FB] hover:bg-[#EAE8F5] border-b-4 border-[#a89dd0] hover:border-[#8a7eb8] rounded-2xl transition-all duration-200 shadow-sm"
                 >
                   <Lock className="w-4 h-4 text-[#6A5E9E]" />
-                  <span>{lang === 'ar' ? 'بوابة تسجيل الدخول' : 'Member Portal'}</span>
+                  <span>{lang === 'ar' ? 'تسجيل الدخول' : 'Member Portal'}</span>
                 </button>
               )}
 
@@ -1671,14 +1671,14 @@ export default function App() {
             </div>
 
             {/* Registration Form Field */}
-            <div className="lg:col-span-8 bg-white rounded-[2.5rem] border-4 border-[#ccc7e8] shadow-xl p-6 sm:p-10 relative ">
-              <div className="absolute top-0 right-10 transform -translate-y-1/2 bg-[#E37C8D] text-white font-bold px-6 py-1.5 rounded-full text-xs shadow-sm font-bold">
+                          <div className="lg:col-span-8 bg-white rounded-[2.5rem] border-4 border-[#F5876C] shadow-xl p-6 sm:p-10 relative ">
+                              <div className="absolute top-0 right-10 transform -translate-y-1/2 bg-[#F5876C] text-white font-bold px-6 py-1.5 rounded-full text-xs shadow-sm font-bold">
                 {t.registrationForm}
               </div>
 
               {!loggedInUser ? (
                 <div className="text-center py-12 px-4 space-y-6">
-                  <div className="w-20 h-20 bg-[#EAE8F5] text-[#6A5E9E] rounded-3xl flex items-center justify-center text-3xl mx-auto shadow-md">
+                                      <div className="w-20 h-20 bg-[#E37C8D]/30 text-[#F5876C] rounded-3xl flex items-center justify-center text-3xl mx-auto shadow-md">
                     <Lock className="w-10 h-10 animate-bounce" />
                   </div>
                   <div className="space-y-2">
@@ -1699,7 +1699,7 @@ export default function App() {
                       clearAuthInputs();
                       setShowAuthModal(true);
                     }}
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-[#AC6E97] hover:bg-[#9a5e88] text-white font-bold rounded-2xl shadow-lg active:scale-95 transition-all text-sm sm:text-base border-b-4 border-[#7a4f72]"
+                                          className="inline-flex items-center gap-2 px-8 py-4 bg-[#6A5E9E] hover:bg-[#5a4e8e] text-white font-bold rounded-2xl shadow-lg active:scale-95 transition-all text-sm sm:text-base border-b-4 border-[#4a4080]"
                   >
                     <Lock className="w-5 h-5" />
                     <span>{lang === 'ar' ? 'تسجيل الدخول / إنشاء حساب ولي الأمر' : 'Log In / Create Parent Account'}</span>
@@ -1897,7 +1897,7 @@ export default function App() {
                             }}
                             className="w-9 h-9 rounded-xl hover:bg-[#FEF0F2] text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all"
                           >
-                            <Trash2 className="w-4.5 h-4.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       )}
